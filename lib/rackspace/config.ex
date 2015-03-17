@@ -18,7 +18,6 @@ defmodule Rackspace.Config do
   """
   def set(value), do: set(current_scope, value)
   def set(:global, value) do 
-    Logger.debug "Put Global Value: #{inspect value}"
     Application.put_env(:rackspace, :auth, value)
   end
   def set(:process, value) do
