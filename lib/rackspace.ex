@@ -11,7 +11,7 @@ defmodule Rackspace do
       # worker(Rackspace.Worker, [arg1, arg2, arg3])
     ]
     config = Application.get_env(:rackspace, :api)
-    
+
     # TODO
     # Need to sanitize values before adding them to the config
     username = config[:username] || System.get_env("RS_USERNAME")
