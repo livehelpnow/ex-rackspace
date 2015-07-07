@@ -28,7 +28,7 @@ defmodule Rackspace.Mixfile do
   defp deps do
     [
       {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1"},
-      {:httpotion, "~> 2.0"},
+      {:httpotion, "~> 2.1.0"},
       {:poison, "~> 1.3"}
     ]
   end
