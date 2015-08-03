@@ -16,7 +16,7 @@ Connection to rackspace API's will require your username and either your account
 
 You can configure the rackspace library by adding a config section to your Application config
 ```elixir
-config :racksapce, :auth,
+config :rackspace, :auth,
   api_key: "xxxxxxxxxxxxxx",
   username: "yyyyyyyyyyyyy",
   password: "zzzzzzzzzzzzz"
