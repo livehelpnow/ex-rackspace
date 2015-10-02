@@ -40,7 +40,7 @@ defmodule Rackspace.Api.Base do
           |> query_params(params)
           |> HTTPotion.put([headers: [
             "X-Auth-Token": auth[:token]
-          ], body: body])
+          ], body: body, timeout: Dict.get(opts, :timeout, 5_000)])
       end
 
       defp request_delete(url, params \\ [], opts \\ []) do
