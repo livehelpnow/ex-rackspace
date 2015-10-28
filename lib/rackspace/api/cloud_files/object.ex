@@ -1,13 +1,13 @@
 defmodule Rackspace.Api.CloudFiles.Object do
   defstruct [
-    container: nil, 
-    bytes: 0, 
-    content_type: nil, 
+    container: nil,
+    bytes: 0,
+    content_type: nil,
     content_encoding: nil,
     hash: nil,
-    last_modified: nil, 
-    name: nil, 
-    metadata: [], 
+    last_modified: nil,
+    name: nil,
+    metadata: [],
     data: <<>>
   ]
 
@@ -21,11 +21,11 @@ defmodule Rackspace.Api.CloudFiles.Object do
     url = "#{CloudFiles.base_url(region)}/#{container}?format=json"
     resp = request_get(url, opts)
     case validate_resp(resp) do
-      {:ok, _} -> 
+      {:ok, _} ->
         resp
           |> Map.get(:body)
           |> Poison.decode!(keys: :atoms)
-          |> Enum.reduce([], fn(object, acc)-> 
+          |> Enum.reduce([], fn(object, acc)->
             [%__MODULE__{
               container: container,
               name: object.name,
@@ -43,9 +43,9 @@ defmodule Rackspace.Api.CloudFiles.Object do
     url = "#{CloudFiles.base_url(region)}/#{container}/#{object}?format=json"
     resp = request_get(url, opts)
     case validate_resp(resp) do
-      {:ok, _} -> 
+      {:ok, _} ->
         Logger.debug "Response Headers: #{inspect resp.headers}"
-        metadata = Enum.filter(resp.headers, fn({k,v}) ->  
+        metadata = Enum.filter(resp.headers, fn({k,v}) ->
           to_string(k)
             |> String.starts_with?("X-Object-Meta")
         end)

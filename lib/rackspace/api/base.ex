@@ -24,23 +24,25 @@ defmodule Rackspace.Api.Base do
 
       defp request_get(url, params \\ [], opts \\ []) do
         auth = get_auth
+        timeout = Application.get_env(:rackspace, :timeout) || 5_000
 
         url
           |> query_params(params)
           |> HTTPotion.get([headers: [
             "X-Auth-Token": auth[:token],
             "Content-Type": "application/json"
-          ]])
+          ], timeout: timeout])
       end
 
       defp request_put(url, body \\ <<>>, params \\ [], opts \\ []) do
         auth = get_auth
+        timeout = Application.get_env(:rackspace, :timeout) || 5_000
 
         url
           |> query_params(params)
           |> HTTPotion.put([headers: [
             "X-Auth-Token": auth[:token]
-          ], body: body])
+          ], body: body, timeout: timeout])
       end
 
       defp request_delete(url, params \\ [], opts \\ []) do

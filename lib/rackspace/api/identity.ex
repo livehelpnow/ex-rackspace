@@ -1,23 +1,23 @@
 defmodule Rackspace.Api.Identity do
   use Rackspace.Api.Base
-  
+
   alias Rackspace.Config
-  require Logger    
+  require Logger
 
   def request do
     auth = Rackspace.Config.get
       |> validate_auth
-    json =  
+    json =
     case auth[:password] do
-      nil -> 
-        %{"auth" => 
-          %{"RAX-KSKEY:apiKeyCredentials" => 
+      nil ->
+        %{"auth" =>
+          %{"RAX-KSKEY:apiKeyCredentials" =>
             %{"username" => auth[:username], "apiKey" => auth[:api_key]}
           }
         }
-      passwd -> 
-        %{"auth" => 
-          %{"passwordCredentials" => 
+      passwd ->
+        %{"auth" =>
+          %{"passwordCredentials" =>
             %{"username" => to_string(auth[:username]), "password" => passwd}
           }
         }
@@ -28,7 +28,7 @@ defmodule Rackspace.Api.Identity do
     resp =
     "https://identity.api.rackspacecloud.com/v2.0/tokens"
       |> HTTPotion.post([
-        body: json, 
+        body: json,
         headers: ["User-Agent": "rackspace-ex", "Content-Type": "application/json"]
       ])
     case validate_resp(resp) do
@@ -42,18 +42,18 @@ defmodule Rackspace.Api.Identity do
         account = [id: body["access"]["user"]["id"], name: body["access"]["user"]["name"]]
         Application.put_env(:rackspace, :account, account)
         Application.put_env(:rackspace, :default_region, body["access"]["user"]["RAX-AUTH:defaultRegion"])
-        Enum.each(body["access"]["serviceCatalog"], fn(%{"name" => name} = service) -> 
-          Application.put_env(:rackspace, String.to_atom(name), Enum.reduce(service, [], fn({k, v}, acc) ->  
+        Enum.each(body["access"]["serviceCatalog"], fn(%{"name" => name} = service) ->
+          Application.put_env(:rackspace, String.to_atom(name), Enum.reduce(service, [], fn({k, v}, acc) ->
             Keyword.put(acc, String.to_atom(k), v)
           end))
         end)
       {_, error} -> error
     end
   end
-  
+
   def validate_auth(auth) do
     Logger.debug "Auth: #{inspect auth}"
-    if auth[:username] == nil and 
+    if auth[:username] == nil and
        (auth[:password] == nil or auth[:api_key] == nil) do
       raise """
         Rackspace config missing password or api key.

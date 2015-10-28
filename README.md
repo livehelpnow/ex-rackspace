@@ -20,6 +20,8 @@ config :rackspace, :api,
   api_key: "xxxxxxxxxxxxxx",
   username: "yyyyyyyyyyyyy",
   password: "zzzzzzzzzzzzz"
+
+config :rackspace, :timeout, 20_0000 # default is 5_000
 ```
 
 Or by setting environment variables
