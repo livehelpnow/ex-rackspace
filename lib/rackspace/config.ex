@@ -8,7 +8,7 @@ defmodule Rackspace.Config do
   Get Auth configuration values.
   """
   def get, do: get(current_scope)
-  def get(:global) do 
+  def get(:global) do
     Application.get_env(:rackspace, :auth, nil)
   end
   def get(:process), do: Process.get(:_rackspace_auth, nil)
@@ -17,7 +17,7 @@ defmodule Rackspace.Config do
   Set Auth configuration values.
   """
   def set(value), do: set(current_scope, value)
-  def set(:global, value) do 
+  def set(:global, value) do
     Application.put_env(:rackspace, :auth, value)
   end
   def set(:process, value) do

@@ -17,6 +17,7 @@ defmodule Rackspace do
     username = config[:username] || System.get_env("RS_USERNAME")
     password = config[:password] || System.get_env("RS_PASSWORD")
     api_key = config[:api_key] || System.get_env("RS_API_KEY")
+    
     Rackspace.configure(
       username: username,
       password: password,
