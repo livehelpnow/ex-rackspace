@@ -94,5 +94,9 @@ defmodule Rackspace.Api.CloudFiles.Object do
     body = objects |> Enum.map(fn(obj) -> URI.encode("#{container}/#{obj}") end) |> Enum.join("\n")
     url = "#{CloudFiles.base_url(region)}?format=json&bulk-delete=true"
     resp = request_delete(url, [], %{content_type: "text/plain"}, body)
+    case validate_resp(resp) do
+      {:ok, _} -> {:ok, :deleted}
+      {_, error} -> error
+    end
   end
 end
