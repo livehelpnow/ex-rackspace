@@ -95,7 +95,11 @@ defmodule Rackspace.Api.CloudFiles.Object do
     url = "#{CloudFiles.base_url(region)}?format=json&bulk-delete=true"
     resp = request_delete(url, [], %{content_type: "text/plain"}, body)
     case validate_resp(resp) do
-      {:ok, _} -> {:ok, :deleted}
+      {:ok, _} ->
+        case Poison.decode(resp.body) do
+          {:ok, body} -> {:ok, body["Number Deleted"]}
+          {_, error} -> {:error, error}
+        end
       {_, error} -> error
     end
   end
