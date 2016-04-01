@@ -4,9 +4,17 @@ defmodule Rackspace.Api.Base do
       import unquote(__MODULE__)
       require Logger
 
+      defp expired? do
+        if expire_date = Rackspace.Config.get[:expires_at] do
+          Timex.before?(Timex.parse!(expire_date, "{ISO:Extended}"), Timex.DateTime.now)
+        else
+          false
+        end
+      end
+
       defp get_auth do
         auth = Rackspace.Config.get
-        if auth[:token] == nil do
+        if auth[:token] == nil || expired? do
           Rackspace.Api.Identity.request
         end
         Rackspace.Config.get

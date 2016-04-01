@@ -12,7 +12,7 @@ defmodule Rackspace.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :httpotion],
+    [applications: [:logger, :httpotion, :timex],
      mod: {Rackspace, []}]
   end
 
@@ -29,8 +29,8 @@ defmodule Rackspace.Mixfile do
     [
       {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
       {:httpotion, "~> 2.1.0"},
+      {:timex, "~> 2.1.1"},
       {:poison, "~> 1.3"}
     ]
   end
 end
-
