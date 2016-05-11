@@ -87,4 +87,20 @@ defmodule Rackspace.Api.CloudFiles.Object do
       {_, error} -> error
     end
   end
+
+  def delete_multiple_objects(container, objects, opts \\ []) do
+    get_auth
+    region = opts[:region] || Application.get_env(:rackspace, :default_region)
+    body = objects |> Enum.map(fn(obj) -> URI.encode("#{container}/#{obj}") end) |> Enum.join("\n")
+    url = "#{CloudFiles.base_url(region)}?format=json&bulk-delete=true"
+    resp = request_delete(url, [], %{content_type: "text/plain"}, body)
+    case validate_resp(resp) do
+      {:ok, _} ->
+        case Poison.decode(resp.body) do
+          {:ok, body} -> {:ok, body["Number Deleted"]}
+          {_, error} -> {:error, error}
+        end
+      {_, error} -> error
+    end
+  end
 end

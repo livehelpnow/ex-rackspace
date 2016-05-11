@@ -45,14 +45,18 @@ defmodule Rackspace.Api.Base do
           ], body: body, timeout: timeout])
       end
 
-      defp request_delete(url, params \\ [], opts \\ []) do
+      defp request_delete(url, params \\ [], opts \\ [], body \\ <<>>) do
         auth = get_auth
+        content_type =  opts[:content_type] || "application/json"
+        accept = opts[:accept] || "application/json"
 
-        url
-          |> query_params(params)
-          |> HTTPotion.delete([headers: [
-            "X-Auth-Token": auth[:token]
-          ]])
+          url
+            |> query_params(params)
+            |> HTTPotion.delete([headers: [
+              "X-Auth-Token": auth[:token],
+              "Content-Type": content_type,
+              "Accept": accept
+            ], body: body])
       end
 
       defp query_params(url, params) do
