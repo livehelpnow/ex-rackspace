@@ -1,28 +1,29 @@
 defmodule Rackspace.Config do
   require Logger
-  def current_scope do
-    if Process.get(:_rackspace_auth, nil), do: :process, else: :global
+
+  def start_link do
+    config = Application.get_env(:rackspace, :api)
+    Agent.start_link(fn ->
+      %{
+        username: config[:username] || System.get_env("RS_USERNAME"),
+        password: config[:password] || System.get_env("RS_PASSWORD"),
+        api_key: config[:api_key] || System.get_env("RS_API_KEY")
+      }
+    end, name: __MODULE__)
   end
 
   @doc """
   Get Auth configuration values.
   """
-  def get, do: get(current_scope)
-  def get(:global) do 
-    Application.get_env(:rackspace, :auth, nil)
+  def get do
+    Agent.get(__MODULE__, &(&1))
   end
-  def get(:process), do: Process.get(:_rackspace_auth, nil)
 
   @doc """
   Set Auth configuration values.
   """
-  def set(value), do: set(current_scope, value)
-  def set(:global, value) do 
-    Application.put_env(:rackspace, :auth, value)
-  end
-  def set(:process, value) do
-    Process.put(:_rackspace_auth, value)
-    :ok
+  def set(value) do
+    Agent.update(__MODULE__, &(Map.merge(&1, value)))
   end
 
   @doc """
