@@ -45,7 +45,7 @@ defmodule Rackspace.Api.CloudFiles.Object do
     case validate_resp(resp) do
       {:ok, _} ->
         Logger.debug "Response Headers: #{inspect resp.headers}"
-        metadata = Enum.filter(resp.headers, fn({k,v}) ->
+        metadata = Enum.filter(resp.headers, fn({k,_v}) ->
           to_string(k)
             |> String.starts_with?("X-Object-Meta")
         end)
