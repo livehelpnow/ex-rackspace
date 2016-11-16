@@ -29,7 +29,7 @@ defmodule Rackspace.Mixfile do
     [
       {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2", override: true},
       {:httpotion, "~> 3.0"},
-      {:timex, "~> 2.1"},
+      {:timex, "~> 3.0"},
       {:poison, "~> 2.0"}
     ]
   end
