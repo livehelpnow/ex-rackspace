@@ -6,7 +6,7 @@ defmodule Rackspace.Api.Base do
 
       defp expired? do
         if expire_date = Rackspace.Config.get[:expires_at] do
-          Timex.before?(Timex.parse!(expire_date, "{ISO:Extended}"), Timex.DateTime.now)
+          Timex.before?(Timex.parse!(expire_date, "{ISO:Extended}"), Timex.now)
         else
           false
         end
