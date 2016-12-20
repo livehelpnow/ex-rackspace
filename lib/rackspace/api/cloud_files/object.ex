@@ -44,22 +44,23 @@ defmodule Rackspace.Api.CloudFiles.Object do
     resp = request_get(url, opts)
     case validate_resp(resp) do
       {:ok, _} ->
-        Logger.debug "Response Headers: #{inspect resp.headers}"
-        metadata = Enum.filter(resp.headers, fn({k,v}) ->
+        headers = resp.headers.hdrs
+        Logger.debug "Response Headers: #{inspect headers}"
+        metadata = Enum.filter(headers, fn({k,_v}) ->
           to_string(k)
-            |> String.starts_with?("X-Object-Meta")
+            |> String.starts_with?("x-container-meta")
         end)
-        {bytes, _} = Integer.parse(resp.headers[:"Content-Length"])
+        {bytes, _} = Integer.parse(headers["content-length"])
 
         %__MODULE__{
           container: container,
           name: object,
           data: resp.body,
-          hash: resp.headers[:Etag],
-          content_type: resp.headers[:"Content-Type"],
-          content_encoding: resp.headers[:"Content-Encoding"],
+          hash: headers["etag"],
+          content_type: headers["content-type"],
+          content_encoding: headers["content-encoding"],
           bytes: bytes,
-          last_modified: resp.headers[:"Last-Modified"],
+          last_modified: headers["last-modified"],
           metadata: metadata
         }
       {_, error} -> error
