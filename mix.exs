@@ -5,7 +5,7 @@ defmodule Rackspace.Mixfile do
     [app: :rackspace,
      version: "0.0.2",
      elixir: "~> 1.3",
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application
