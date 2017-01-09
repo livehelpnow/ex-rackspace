@@ -4,8 +4,8 @@ defmodule Rackspace.Mixfile do
   def project do
     [app: :rackspace,
      version: "0.0.2",
-     elixir: "~> 1.0",
-     deps: deps]
+     elixir: "~> 1.3",
+     deps: deps()]
   end
 
   # Configuration for the OTP application
@@ -27,10 +27,10 @@ defmodule Rackspace.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2", override: true},
+      {:ibrowse, "~> 4.2"},
       {:httpotion, "~> 3.0"},
-      {:timex, "~> 2.1"},
-      {:poison, "~> 1.3"}
+      {:timex, "~> 3.0"},
+      {:poison, "~> 2.0"}
     ]
   end
 end

@@ -16,7 +16,7 @@ defmodule Rackspace.Api.CloudFiles.Object do
   alias Rackspace.Api.CloudFiles
 
   def list(container, opts \\ []) do
-    get_auth
+    get_auth()
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
     url = "#{CloudFiles.base_url(region)}/#{container}?format=json"
     resp = request_get(url, opts)
@@ -38,7 +38,7 @@ defmodule Rackspace.Api.CloudFiles.Object do
   end
 
   def get(container, object, opts \\ []) do
-    get_auth
+    get_auth()
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
     url = "#{CloudFiles.base_url(region)}/#{container}/#{object}?format=json"
     resp = request_get(url, opts)
@@ -68,7 +68,7 @@ defmodule Rackspace.Api.CloudFiles.Object do
   end
 
   def put(container, name, data, opts \\ []) do
-    get_auth
+    get_auth()
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
     url = "#{CloudFiles.base_url(region)}/#{container}/#{name}?format=json"
     resp = request_put(url, data, opts)
@@ -79,7 +79,7 @@ defmodule Rackspace.Api.CloudFiles.Object do
   end
 
   def delete(container, object, opts \\ []) do
-    get_auth
+    get_auth()
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
     url = "#{CloudFiles.base_url(region)}/#{container}/#{object}?format=json"
     resp = request_delete(url)
@@ -90,7 +90,7 @@ defmodule Rackspace.Api.CloudFiles.Object do
   end
 
   def delete_multiple_objects(container, objects, opts \\ []) do
-    get_auth
+    get_auth()
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
     body = objects |> Enum.map(fn(obj) -> URI.encode("#{container}/#{obj}") end) |> Enum.join("\n")
     url = "#{CloudFiles.base_url(region)}?format=json&bulk-delete=true"

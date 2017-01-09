@@ -6,7 +6,7 @@ defmodule Rackspace.Api.Base do
 
       defp expired? do
         if expire_date = Rackspace.Config.get[:expires_at] do
-          Timex.before?(Timex.parse!(expire_date, "{ISO:Extended}"), Timex.DateTime.now)
+          Timex.before?(Timex.parse!(expire_date, "{ISO:Extended}"), Timex.now)
         else
           false
         end
@@ -14,7 +14,7 @@ defmodule Rackspace.Api.Base do
 
       defp get_auth do
         auth = Rackspace.Config.get
-        if auth[:token] == nil || expired? do
+        if auth[:token] == nil || expired?() do
           Rackspace.Api.Identity.request
         end
         Rackspace.Config.get
@@ -31,7 +31,7 @@ defmodule Rackspace.Api.Base do
       end
 
       defp request_get(url, params \\ [], opts \\ []) do
-        auth = get_auth
+        auth = get_auth()
         timeout = Application.get_env(:rackspace, :timeout) || 5_000
 
         url
@@ -43,7 +43,7 @@ defmodule Rackspace.Api.Base do
       end
 
       defp request_put(url, body \\ <<>>, params \\ [], opts \\ []) do
-        auth = get_auth
+        auth = get_auth()
         timeout = Application.get_env(:rackspace, :timeout) || 5_000
 
         url
@@ -54,7 +54,7 @@ defmodule Rackspace.Api.Base do
       end
 
       defp request_delete(url, params \\ [], opts \\ [], body \\ <<>>) do
-        auth = get_auth
+        auth = get_auth()
         content_type =  opts[:content_type] || "application/json"
         accept = opts[:accept] || "application/json"
 
