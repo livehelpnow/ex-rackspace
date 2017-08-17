@@ -22,7 +22,8 @@ defmodule Rackspace.Api.Identity do
           }
         }
     end |> Poison.encode!
-    Logger.debug "Json: #{inspect json}"
+    safe_json = Regex.replace(~r/"apiKey":"[^"]+"/, json, ~s("api_key": "RETRACTED"))
+    Logger.debug "Json: #{inspect(safe_json)}"
 
     HTTPotion.start
     resp =
@@ -52,7 +53,8 @@ defmodule Rackspace.Api.Identity do
   end
 
   def validate_auth(auth) do
-    Logger.debug "Auth: #{inspect auth}"
+    auth_safe = %{auth | api_key: "RETRACTED", password: "RETRACTED"}
+    Logger.debug "Auth: #{inspect(auth_safe)}"
     if auth[:username] == nil and
        (auth[:password] == nil or auth[:api_key] == nil) do
       raise """
