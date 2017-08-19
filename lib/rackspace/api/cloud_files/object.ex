@@ -12,13 +12,12 @@ defmodule Rackspace.Api.CloudFiles.Object do
   ]
 
   require Logger
-  use Rackspace.Api.Base
-  alias Rackspace.Api.CloudFiles
+  use Rackspace.Api.Base, service: :cloud_files
 
   def list(container, opts \\ []) do
     get_auth()
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
-    url = "#{CloudFiles.base_url(region)}/#{container}?format=json"
+    url = "#{base_url(region)}/#{container}?format=json"
     resp = request_get(url, opts)
     case validate_resp(resp) do
       {:ok, _} ->
@@ -33,19 +32,18 @@ defmodule Rackspace.Api.CloudFiles.Object do
               content_type: object.content_type
             } | acc]
           end)
-      {_, error} -> error
+      {:error, error} -> error
     end
   end
 
   def get(container, object, opts \\ []) do
     get_auth()
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
-    url = "#{CloudFiles.base_url(region)}/#{container}/#{object}?format=json"
+    url = "#{base_url(region)}/#{container}/#{object}?format=json"
     resp = request_get(url, opts)
     case validate_resp(resp) do
       {:ok, _} ->
         headers = resp.headers.hdrs
-        Logger.debug "Response Headers: #{inspect headers}"
         metadata = Enum.filter(headers, fn({k,_v}) ->
           to_string(k)
             |> String.starts_with?("x-container-meta")
@@ -63,29 +61,29 @@ defmodule Rackspace.Api.CloudFiles.Object do
           last_modified: headers["last-modified"],
           metadata: metadata
         }
-      {_, error} -> error
+      {:error, error} -> error
     end
   end
 
   def put(container, name, data, opts \\ []) do
     get_auth()
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
-    url = "#{CloudFiles.base_url(region)}/#{container}/#{name}?format=json"
+    url = "#{base_url(region)}/#{container}/#{name}?format=json"
     resp = request_put(url, data, opts)
     case validate_resp(resp) do
       {:ok, _} -> {:ok, :created}
-      {_, error} -> error
+      {:error, error} -> error
     end
   end
 
   def delete(container, object, opts \\ []) do
     get_auth()
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
-    url = "#{CloudFiles.base_url(region)}/#{container}/#{object}?format=json"
+    url = "#{base_url(region)}/#{container}/#{object}?format=json"
     resp = request_delete(url)
     case validate_resp(resp) do
       {:ok, _} -> {:ok, :deleted}
-      {_, error} -> error
+      {:error, error} -> error
     end
   end
 
@@ -93,7 +91,7 @@ defmodule Rackspace.Api.CloudFiles.Object do
     get_auth()
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
     body = objects |> Enum.map(fn(obj) -> URI.encode("#{container}/#{obj}") end) |> Enum.join("\n")
-    url = "#{CloudFiles.base_url(region)}?format=json&bulk-delete=true"
+    url = "#{base_url(region)}?format=json&bulk-delete=true"
     resp = request_delete(url, [], %{content_type: "text/plain"}, body)
     case validate_resp(resp) do
       {:ok, _} ->
@@ -101,7 +99,7 @@ defmodule Rackspace.Api.CloudFiles.Object do
           {:ok, body} -> {:ok, body["Number Deleted"]}
           {_, error} -> {:error, error}
         end
-      {_, error} -> error
+      {:error, error} -> error
     end
   end
 end

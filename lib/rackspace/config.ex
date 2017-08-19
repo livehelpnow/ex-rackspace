@@ -3,11 +3,15 @@ defmodule Rackspace.Config do
 
   def start_link do
     config = Application.get_env(:rackspace, :api)
-    Agent.start_link(fn ->
+    username = config[:username] || System.get_env("RS_USERNAME")
+    password = config[:password] || System.get_env("RS_PASSWORD")
+    api_key = config[:api_key] || System.get_env("RS_API_KEY")
+
+    Agent.start_link(fn -> 
       %{
-        username: config[:username] || System.get_env("RS_USERNAME"),
-        password: config[:password] || System.get_env("RS_PASSWORD"),
-        api_key: config[:api_key] || System.get_env("RS_API_KEY")
+        username: username,
+        password: password,
+        api_key: api_key
       }
     end, name: __MODULE__)
   end

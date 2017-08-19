@@ -3,9 +3,12 @@ defmodule Rackspace.Mixfile do
 
   def project do
     [app: :rackspace,
-     version: "0.0.2",
+     version: "0.1.0",
      elixir: "~> 1.3",
-     deps: deps()]
+     deps: deps(),
+     test_coverage: [tool: ExCoveralls],
+     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test]
+    ]
   end
 
   # Configuration for the OTP application
@@ -30,7 +33,8 @@ defmodule Rackspace.Mixfile do
       {:ibrowse, "~> 4.2"},
       {:httpotion, "~> 3.0"},
       {:timex, "~> 3.0"},
-      {:poison, "~> 2.0"}
+      {:poison, "~> 2.0"},
+      {:excoveralls, "~> 0.7", only: :test}
     ]
   end
 end

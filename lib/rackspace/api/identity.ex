@@ -1,5 +1,5 @@
 defmodule Rackspace.Api.Identity do
-  use Rackspace.Api.Base
+  use Rackspace.Api.Base, service: :cloud_auth_service
 
   alias Rackspace.Config
   require Logger
@@ -7,25 +7,24 @@ defmodule Rackspace.Api.Identity do
   def request do
     auth = Rackspace.Config.get
       |> validate_auth
-    json =
-    case auth[:password] do
-      nil ->
-        %{"auth" =>
-          %{"RAX-KSKEY:apiKeyCredentials" =>
-            %{"username" => auth[:username], "apiKey" => auth[:api_key]}
+    json = case auth[:password] do
+        nil ->
+          %{"auth" =>
+            %{"RAX-KSKEY:apiKeyCredentials" =>
+              %{"username" => auth[:username], "apiKey" => auth[:api_key]}
+            }
           }
-        }
-      passwd ->
-        %{"auth" =>
-          %{"passwordCredentials" =>
-            %{"username" => to_string(auth[:username]), "password" => passwd}
+        passwd ->
+          %{"auth" =>
+            %{"passwordCredentials" =>
+              %{"username" => to_string(auth[:username]), "password" => passwd}
+            }
           }
-        }
-    end |> Poison.encode!
+      end 
+      |> Poison.encode!
     safe_json = Regex.replace(~r/"apiKey":"[^"]+"/, json, ~s("api_key": "RETRACTED"))
     Logger.debug "Json: #{inspect(safe_json)}"
 
-    HTTPotion.start
     resp =
     "https://identity.api.rackspacecloud.com/v2.0/tokens"
       |> HTTPotion.post([
@@ -37,18 +36,20 @@ defmodule Rackspace.Api.Identity do
         body = resp
           |> Map.get(:body)
           |> Poison.decode!
-        Logger.debug "Resp: #{inspect resp}"
+        Logger.debug "Resp: #{inspect body}"
         %{token: body["access"]["token"]["id"], expires_at: body["access"]["token"]["expires"]}
           |> Config.set
         account = [id: body["access"]["user"]["id"], name: body["access"]["user"]["name"]]
         Application.put_env(:rackspace, :account, account)
         Application.put_env(:rackspace, :default_region, body["access"]["user"]["RAX-AUTH:defaultRegion"])
         Enum.each(body["access"]["serviceCatalog"], fn(%{"name" => name} = service) ->
-          Application.put_env(:rackspace, String.to_atom(name), Enum.reduce(service, [], fn({k, v}, acc) ->
+          Application.put_env(:rackspace, String.to_atom(Macro.underscore(name)), Enum.reduce(service, [], fn({k, v}, acc) ->
             Keyword.put(acc, String.to_atom(k), v)
           end))
         end)
-      {_, error} -> error
+        {:ok}        
+      {:error, error} -> 
+        {:error, error}
     end
   end
 
