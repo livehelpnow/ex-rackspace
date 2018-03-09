@@ -33,7 +33,7 @@ defmodule Rackspace.Mixfile do
       {:ibrowse, "~> 4.2"},
       {:httpotion, "~> 3.0"},
       {:timex, "~> 3.0"},
-      {:poison, "~> 2.0"},
+      {:poison, "~> 3.0"},
       {:excoveralls, "~> 0.7", only: :test}
     ]
   end
