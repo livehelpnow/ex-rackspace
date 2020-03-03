@@ -125,10 +125,12 @@ defmodule Rackspace.Api.Base do
           %{token: token} when is_nil(token) == false ->
             timeout = Application.get_env(:rackspace, :timeout) || 5_000
             timeout = Keyword.get(opts, :timout, timeout)
+            expire_at = Keyword.get(params, :expire_at, 63072000)
             url
               |> query_params(params)
               |> HTTPotion.put([headers: [
-                "X-Auth-Token": token
+                "X-Auth-Token": token,
+                "X-Delete-After": expire_at
               ], body: body, timeout: timeout])
           _ -> 
             %Rackspace.Error{code: 0, message: "token_expired"}
