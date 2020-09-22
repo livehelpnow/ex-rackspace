@@ -29,7 +29,9 @@ defmodule Rackspace.Api.CloudFiles.Object do
               container: container,
               name: object.name,
               bytes: object.bytes,
-              content_type: object.content_type
+              content_type: object.content_type,
+              last_modified: object.last_modified,
+              hash: object.hash,
             } | acc]
           end)
       {:error, error} -> error
