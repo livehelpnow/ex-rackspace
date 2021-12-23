@@ -8,21 +8,21 @@ defmodule Rackspace.Api.CloudFiles.Container do
   require Logger
 
   @doc """
-  Returns the list of cloud containers in rackspace. 
+  Returns the list of cloud containers in rackspace.
 
   Containeres are like folders, there is option to pass which region you want to use `[region: ord]`
-  
-  ## Examples 
+
+  ## Examples
     alias Rackspace.Api.CloudFiles.Container
     require Logger
 
     case Container.list([region: "ORD"]) do
-      list when is_list(list) -> 
+      list when is_list(list) ->
         Logger.info(inspect(list))
       %Rackspace.Error{code: 403, message: message} ->
-        Logger.error(message) 
-        # this should not happen but left for example purposes  
-      %Rackspace.Error{code: 0, message: message} -> 
+        Logger.error(message)
+        # this should not happen but left for example purposes
+      %Rackspace.Error{code: 0, message: message} ->
         Logger.error(message)
         # probably network error or timout
         # .. error
@@ -34,19 +34,25 @@ defmodule Rackspace.Api.CloudFiles.Container do
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
     url = "#{base_url(region)}?format=json"
     resp = request_get(url, opts)
+
     case validate_resp(resp) do
-      {:ok, _} ->
-        resp
-          |> Map.get(:body)
-          |> Poison.decode!(keys: :atoms)
-          |> Enum.reduce([], fn(container, acc)->
-            [%__MODULE__{
+      {:ok, data} ->
+        data
+        |> Map.get(:body)
+        |> Jason.decode!(keys: :atoms)
+        |> Enum.reduce([], fn container, acc ->
+          [
+            %__MODULE__{
               name: container.name,
               count: container.count,
               bytes: container.bytes
-            } | acc]
-          end)
-      {:error, error} -> error
+            }
+            | acc
+          ]
+        end)
+
+      {:error, error} ->
+        error
     end
   end
 
@@ -55,6 +61,7 @@ defmodule Rackspace.Api.CloudFiles.Container do
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
     url = "#{base_url(region)}/#{container}?format=json"
     resp = request_put(url, <<>>, opts)
+
     case validate_resp(resp) do
       {:ok, _} -> {:ok, :created}
       {:error, error} -> error
@@ -66,10 +73,10 @@ defmodule Rackspace.Api.CloudFiles.Container do
     region = opts[:region] || Application.get_env(:rackspace, :default_region)
     url = "#{base_url(region)}/#{container}?format=json"
     resp = request_delete(url, opts)
+
     case validate_resp(resp) do
       {:ok, _} -> {:ok, :deleted}
       {:error, error} -> error
     end
   end
-
 end
