@@ -48,25 +48,24 @@ defmodule Rackspace.Api.CloudFiles.Object do
 
     case validate_resp(resp) do
       {:ok, resp} ->
-        headers = resp.headers.hdrs
+        headers = resp.headers |> Enum.into(%{})
 
         metadata =
           Enum.filter(headers, fn {k, _v} ->
-            to_string(k)
-            |> String.starts_with?("x-container-meta")
+            to_string(k) |> String.starts_with?("X-Container-Meta")
           end)
 
-        {bytes, _} = Integer.parse(headers["content-length"])
+        {bytes, _} = Integer.parse(headers["Content-Length"])
 
         %__MODULE__{
           container: container,
           name: object,
           data: resp.body,
-          hash: headers["etag"],
-          content_type: headers["content-type"],
-          content_encoding: headers["content-encoding"],
+          hash: headers["Etag"],
+          content_type: headers["Content-Type"],
+          content_encoding: headers["Content-Encoding"],
           bytes: bytes,
-          last_modified: headers["last-modified"],
+          last_modified: headers["Last-Modified"],
           metadata: metadata
         }
 
