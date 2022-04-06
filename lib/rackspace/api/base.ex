@@ -84,9 +84,9 @@ defmodule Rackspace.Api.Base do
           when status_code >= 200 and status_code <= 300 ->
             {:ok, data}
 
-          {:ok, %HTTPoison.Response{}} ->
+          {:ok, %HTTPoison.Response{status_code: status_code, body: message}} ->
             # validation and conflict errors in case 4XX errors and 500 should have empty body
-            {:error, %Rackspace.Error{code: resp.status_code, message: resp.body}}
+            {:error, %Rackspace.Error{code: status_code, message: message}}
 
           {:error, %HTTPoison.Error{reason: message}} ->
             {:error, %Rackspace.Error{code: 0, message: message}}
