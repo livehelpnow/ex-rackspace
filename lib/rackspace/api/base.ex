@@ -80,16 +80,16 @@ defmodule Rackspace.Api.Base do
 
       defp validate_resp(resp) do
         case resp do
-          {:ok, %HTTPoison.Response{status_code: status_code} = data}
+          {:ok, %Req.Response{status: status_code} = data}
           when status_code >= 200 and status_code <= 300 ->
             {:ok, data}
 
-          {:ok, %HTTPoison.Response{status_code: status_code, body: message}} ->
+          {:ok, %Req.Response{status: status_code, body: message}} ->
             # validation and conflict errors in case 4XX errors and 500 should have empty body
             {:error, %Rackspace.Error{code: status_code, message: message}}
 
-          {:error, %HTTPoison.Error{reason: message}} ->
-            {:error, %Rackspace.Error{code: 0, message: message}}
+          {:error, exception} ->
+            {:error, %Rackspace.Error{code: 0, message: Exception.message(exception)}}
         end
       end
 
@@ -99,14 +99,12 @@ defmodule Rackspace.Api.Base do
             timeout = Application.get_env(:rackspace, :timeout) || 5_000
             timeout = Keyword.get(opts, :timout, timeout)
 
-            url
-            |> query_params(params)
-            |> HTTPoison.get(
-              [
-                "X-Auth-Token": token,
-                "Content-Type": "application/json"
-              ],
-              recv_timeout: timeout
+            url = url |> query_params(params)
+
+            Req.get(url,
+              headers: %{"x-auth-token" => token, "content-type" => "application/json"},
+              retry: false,
+              receive_timeout: timeout
             )
 
           _ ->
@@ -120,14 +118,13 @@ defmodule Rackspace.Api.Base do
             timeout = Application.get_env(:rackspace, :timeout) || 5_000
             timeout = Keyword.get(opts, :timout, timeout)
 
-            url
-            |> query_params(params)
-            |> HTTPoison.post(
-              body,
-              [
-                "X-Auth-Token": token
-              ],
-              recv_timeout: timeout
+            url = url |> query_params(params)
+
+            Req.post(url,
+              body: body,
+              headers: %{"x-auth-token" => token},
+              retry: false,
+              receive_timeout: timeout
             )
 
           _ ->
@@ -142,15 +139,12 @@ defmodule Rackspace.Api.Base do
             timeout = Keyword.get(opts, :timout, timeout)
             expire_at = Keyword.get(params, :expire_at, 63_072_000)
 
-            url
-            |> query_params(params)
-            |> HTTPoison.put(
-              body,
-              [
-                "X-Auth-Token": token,
-                "X-Delete-After": expire_at
-              ],
-              recv_timeout: timeout
+            url = url |> query_params(params)
+
+            Req.put(url,
+              headers: %{"x-auth-token" => token, "x-delete-after" => expire_at},
+              retry: false,
+              receive_timeout: timeout
             )
 
           _ ->
@@ -166,19 +160,13 @@ defmodule Rackspace.Api.Base do
             timeout = Application.get_env(:rackspace, :timeout) || 5_000
             timeout = Keyword.get(opts, :timout, timeout)
 
-            url =
-              url
-              |> query_params(params)
+            url = url |> query_params(params)
 
-            HTTPoison.request(
-              :delete,
-              url,
-              body,
-              [
-                Accept: accept
-              ],
-              timeout: timeout,
-              recv_timeout: timeout
+            Req.delete(url,
+              body: body,
+              headers: %{"x-auth-token" => token, "accept" => accept, "content-type" => content_type},
+              retry: false,
+              receive_timeout: timeout
             )
 
           _ ->
