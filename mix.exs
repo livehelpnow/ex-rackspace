@@ -28,7 +28,6 @@ defmodule Rackspace.Mixfile do
     [
       {:ibrowse, "~> 4.2"},
       {:req, "~> 0.4"},
-      {:timex, "~> 3.0"},
       {:jason, "~> 1.0"},
       {:excoveralls, "~> 0.7", only: :test}
     ]

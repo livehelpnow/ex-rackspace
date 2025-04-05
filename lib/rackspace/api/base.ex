@@ -56,7 +56,8 @@ defmodule Rackspace.Api.Base do
 
       defp expired? do
         if expire_date = Rackspace.Config.get()[:expires_at] do
-          Timex.before?(Timex.parse!(expire_date, "{ISO:Extended}"), Timex.now())
+          {:ok, date} =DateTime.from_iso8601(expire_date)
+          DateTime.compare(dt, DateTime.utc_now()) == :lt
         else
           false
         end
