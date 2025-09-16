@@ -37,11 +37,10 @@ defmodule Rackspace.Api.Identity do
     Logger.debug("Json: #{inspect(safe_json)}")
 
     resp =
-      "https://identity.api.rackspacecloud.com/v2.0/tokens"
-      |> HTTPoison.post(
-        json,
-        "User-Agent": "rackspace-ex",
-        "Content-Type": "application/json"
+      Req.post("https://identity.api.rackspacecloud.com/v2.0/tokens",
+        body: json,
+        headers: %{"user-agent" => "rackspace-ex", "content_type" => "application/json"},
+        retry: false
       )
 
     case validate_resp(resp) do

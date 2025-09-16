@@ -27,8 +27,7 @@ defmodule Rackspace.Mixfile do
   defp deps do
     [
       {:ibrowse, "~> 4.2"},
-      {:httpoison, "~> 1.0"},
-      {:timex, "~> 3.0"},
+      {:req, "~> 0.4"},
       {:jason, "~> 1.0"},
       {:excoveralls, "~> 0.7", only: :test}
     ]
