@@ -48,7 +48,6 @@ defmodule Rackspace.Api.Identity do
         body =
           resp
           |> Map.get(:body)
-          |> Jason.decode!()
 
         Logger.debug("Resp: #{inspect(body)}")
 

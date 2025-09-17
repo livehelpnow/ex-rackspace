@@ -39,13 +39,12 @@ defmodule Rackspace.Api.CloudFiles.Container do
       {:ok, data} ->
         data
         |> Map.get(:body)
-        |> Jason.decode!(keys: :atoms)
         |> Enum.reduce([], fn container, acc ->
           [
             %__MODULE__{
-              name: container.name,
-              count: container.count,
-              bytes: container.bytes
+              name: container["name"],
+              count: container["count"],
+              bytes: container["bytes"]
             }
             | acc
           ]
