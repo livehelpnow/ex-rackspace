@@ -22,14 +22,13 @@ defmodule Rackspace.Api.CloudFiles.Object do
       {:ok, resp} ->
         resp
         |> Map.get(:body)
-        |> Jason.decode!(keys: :atoms)
         |> Enum.reduce([], fn object, acc ->
           [
             %__MODULE__{
               container: container,
-              name: object.name,
-              bytes: object.bytes,
-              content_type: object.content_type
+              name: object["name"],
+              bytes: object["bytes"],
+              content_type: object["content_type"]
             }
             | acc
           ]
@@ -52,20 +51,28 @@ defmodule Rackspace.Api.CloudFiles.Object do
 
         metadata =
           Enum.filter(headers, fn {k, _v} ->
-            to_string(k) |> String.starts_with?("X-Container-Meta")
+            to_string(k) |> String.starts_with?("x-container-meta")
           end)
 
-        {bytes, _} = Integer.parse(headers["Content-Length"])
+        bytes =
+          case headers["content-length"] do
+          nil ->
+            nil
+          value ->
+            {bytes, _} = Integer.parse(value)
+            bytes
+        end
+
 
         %__MODULE__{
           container: container,
           name: object,
           data: resp.body,
-          hash: headers["Etag"],
-          content_type: headers["Content-Type"],
-          content_encoding: headers["Content-Encoding"],
+          hash: headers["etag"],
+          content_type: headers["content-type"],
+          content_encoding: headers["content-encoding"],
           bytes: bytes,
-          last_modified: headers["Last-Modified"],
+          last_modified: headers["last-modified"],
           metadata: metadata
         }
 
@@ -107,7 +114,7 @@ defmodule Rackspace.Api.CloudFiles.Object do
 
     case validate_resp(resp) do
       {:ok, resp} ->
-        case Jason.decode(resp.body) do
+        case resp.body do
           {:ok, body} -> {:ok, body["Number Deleted"]}
           {_, error} -> {:error, error}
         end
