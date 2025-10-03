@@ -143,7 +143,7 @@ defmodule Rackspace.Api.Base do
             url = url |> query_params(params)
 
             Req.put(url,
-              headers: %{"x-auth-token" => token, "x-delete-after" => expire_at},
+              headers: %{"x-auth-token" => token, "x-delete-after" => expire_at, "Content-Length" => opts[:length], "Content-Type" => opts[:content_type]},
               retry: false,
               receive_timeout: timeout
             )
