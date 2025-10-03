@@ -48,7 +48,7 @@ defmodule Rackspace.Api.Base do
       require Logger
 
       defp base_url(region, opts \\ []) do
-        Application.get_env(:rackspace, service)
+        Application.get_env(:rackspace, unquote(service))
         |> Keyword.get(:endpoints)
         |> Enum.find(fn ep -> String.downcase(ep["region"]) == String.downcase(region) end)
         |> Map.get("publicURL")
