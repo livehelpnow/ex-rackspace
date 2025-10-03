@@ -105,7 +105,8 @@ defmodule Rackspace.Api.Base do
             Req.get(url,
               headers: %{"x-auth-token" => token, "content-type" => "application/json"},
               retry: false,
-              receive_timeout: timeout
+              receive_timeout: timeout,
+              raw: true
             )
 
           _ ->
