@@ -56,12 +56,15 @@ defmodule Rackspace.Api.CloudFiles.Object do
 
         bytes =
           case headers["content-length"] do
-          nil ->
-            nil
-          value ->
-            {bytes, _} = Integer.parse(value)
-            bytes
-        end
+            nil ->
+              nil
+            value when is_list(value) ->
+              {bytes, _} = Integer.parse(List.first(value))
+              bytes
+            value ->
+              {bytes, _} = Integer.parse(value)
+              bytes
+          end
 
 
         %__MODULE__{
