@@ -142,9 +142,15 @@ defmodule Rackspace.Api.Base do
             expire_at = Keyword.get(params, :expire_at, 63_072_000)
 
             url = url |> query_params(params)
+            headers =
+              if expire_at == nil do
+                %{"x-auth-token" => token, "Content-Length" => params[:length], "Content-Type" => params[:content_type]}
+              else
+                %{"x-auth-token" => token, "x-delete-after" => expire_at, "Content-Length" => params[:length], "Content-Type" => params[:content_type]}
+              end
 
             Req.put(url,
-              headers: %{"x-auth-token" => token, "x-delete-after" => expire_at, "Content-Length" => params[:length], "Content-Type" => params[:content_type]},
+              headers: headers,
               body: body,
               retry: false,
               receive_timeout: timeout
